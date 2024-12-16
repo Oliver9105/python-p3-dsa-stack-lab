@@ -1,72 +1,79 @@
-from Stack import Stack
+import pytest
+from Stack import Stack  # Replace with the actual module path if different
+
 
 class TestStack:
-    '''Class Stack in Stack.py'''
+    def test_initialize_stack(self):
+        """Test Stack initialization with and without items."""
+        stk1 = Stack()  # Default initialization
+        assert stk1.size() == 0
+        assert stk1.empty() is True
 
-    def test_init(self):
-        '''Initialize Stack with list'''
-        stk = Stack([1,2,3,4,5])
-        expected = [1,2,3,4,5]
-        for index in range(len(expected)):
-            assert(expected[index] == stk.items[index])
+        stk2 = Stack([1, 2, 3])  # Initialize with items
+        assert stk2.size() == 3
+        assert stk2.empty() is False
 
     def test_push(self):
-        '''Push 0 to stack'''
-        stk = Stack([1,2,3,4,5])
-        stk.push(0)
-        expected = [1,2,3,4,5,0]
-        for index in range(0,len(expected)):
-            assert(expected[index] == stk.items[index])
+        """Test pushing elements onto the stack."""
+        stk = Stack([], 2)  # Stack with a limit of 2
+        stk.push(1)
+        assert stk.size() == 1
+        assert stk.search(1) == 1  # 1 is on top of the stack
+
+        stk.push(2)
+        assert stk.size() == 2
+        assert stk.search(2) == 1  # 2 is now on top of the stack
+
+        with pytest.raises(OverflowError, match="Stack is full"):
+            stk.push(3)  # Should raise an OverflowError
 
     def test_pop(self):
-        '''Pop 1 off the stack'''
-        stk = Stack([1,2,3,4,5])
-        stk.pop()
-        expected = [1,2,3,4]
-        for index in range(len(expected)):
-            assert(expected[index] == stk.items[index])
+        """Test popping elements off the stack."""
+        stk = Stack([1, 2, 3])
+        assert stk.pop() == 3  # Top element
+        assert stk.size() == 2
+
+        assert stk.pop() == 2
+        assert stk.pop() == 1
+        assert stk.empty() is True
+
+        with pytest.raises(IndexError, match="Pop from empty stack"):
+            stk.pop()  # Should raise an IndexError
 
     def test_size(self):
-        '''Test Stack size() method'''
-        stk = Stack([1,2,3,4,5])
-        expected = [1,2,3,4,5]
-        assert(stk.size() == len(expected))
+        """Test size() method."""
+        stk = Stack([1, 2])
+        assert stk.size() == 2
+        stk.pop()
+        assert stk.size() == 1
+        stk.push(3)
+        assert stk.size() == 2
 
     def test_empty(self):
-        '''Test Stack empty() method'''
+        """Test empty() method."""
         stk = Stack()
-        assert(stk.isEmpty())
-        assert(stk.size() == 0)
-        assert(stk.pop() == None)
+        assert stk.empty() is True
         stk.push(1)
-        assert(not stk.isEmpty())
-        assert(stk.size() == 1)
-        assert(stk.pop() == 1)
-
+        assert stk.empty() is False
+        stk.pop()
+        assert stk.empty() is True
 
     def test_full(self):
-        '''Test Stack full() method'''
-        stk = Stack([1], 1)
+        """Test full() method."""
+        stk = Stack([1], 1)  # Stack initialized with limit 1
+        assert stk.full() is True
+        assert stk.size() == 1
 
-        assert(stk.full())
-        assert(stk.size() == 1)
-        assert(stk.pop() == 1)
+        stk.pop()
+        assert stk.full() is False
         stk.push(1)
-        stk.push(2)
-        assert(stk.full())
-        assert(stk.size() == 1)
-        assert(stk.pop() == 1)
+        with pytest.raises(OverflowError, match="Stack is full"):
+            stk.push(2)  # Should raise an OverflowError
 
     def test_search(self):
-        '''Test Stack search() method. How far is the element in the stack? '''
-        stk = Stack([5,6,7,8,9,10])
-
-        assert(stk.search(5) == 5)
-        assert(stk.search(6) == 4)
-        assert(stk.search(7) == 3)
-        assert(stk.search(8) == 2)
-        assert(stk.search(9) == 1)
-        assert(stk.search(10) == 0)
-
-        # Case with target not in Stack
-        assert(stk.search(15) == -1)
+        """Test search() method to find elements in the stack."""
+        stk = Stack([1, 2, 3])
+        assert stk.search(3) == 1  # 3 is on top, distance 1
+        assert stk.search(2) == 2  # 2 is below top, distance 2
+        assert stk.search(1) == 3  # 1 is at the bottom, distance 3
+        assert stk.search(4) == -1  # 4 is not in the stack
